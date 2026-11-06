@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Outbreakle</title>
+<style>
+:root{color-scheme:dark;--ink:#f7e8cc;--gold:#f6bb69;--night:#171c24;--paper:#f4e6c8}
+*{box-sizing:border-box}body{margin:0;background:var(--night);color:var(--ink);font:16px/1.55 system-ui,sans-serif}button,input{font:inherit}button{cursor:pointer;border:1px solid #a88b65;border-radius:7px;padding:.65em 1em;background:#302b27;color:var(--ink)}button:disabled{opacity:.45;cursor:default}.primary{background:var(--gold);color:#261b15;font-weight:750}button:hover:enabled{filter:brightness(1.15)}:focus-visible{outline:3px solid #5bbfbc;outline-offset:4px}[hidden]{display:none!important}header{display:flex;justify-content:space-between;gap:12px;padding:14px clamp(12px,4vw,40px);align-items:center;border-bottom:1px solid #ffffff25}.controls{display:flex;flex-wrap:wrap;gap:8px}.brand{font:bold 1.3rem Georgia}main{max-width:1050px;margin:auto;padding:24px 16px 60px}section.screen{animation:arrive .35s ease-out}@keyframes arrive{from{opacity:0;transform:translateY(24px)}}
+h1,h2,h3{font-family:Georgia,serif;line-height:1.1}h1{font-size:clamp(2.6rem,8vw,6rem);margin:.18em 0}h2{font-size:clamp(1.7rem,4vw,2.5rem)}.eyebrow{font:700 .8rem ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}.home{text-align:center;padding:clamp(40px,13vh,140px) 12px;background:radial-gradient(ellipse at center,#524031,transparent 68%)}.home p{max-width:45ch;margin:18px auto 28px}.stack{display:grid;gap:10px;max-width:420px;margin:auto}.case-list{display:grid;gap:12px}.case-list button{text-align:left}.muted{opacity:.78}
+.scene{position:relative;min-height:310px;border-radius:12px;overflow:hidden;background:linear-gradient(#171936,#65536b 67%,#222c29 68%)}.scene svg{width:100%;height:100%;position:absolute;inset:0}.guest{animation:sway 3s ease-in-out infinite;transform-box:fill-box;transform-origin:bottom}.guest:nth-of-type(2n){animation-delay:-1.5s}.lamp{animation:glow 2s alternate infinite}@keyframes sway{50%{transform:rotate(6deg) translateX(4px)}}@keyframes glow{to{opacity:.5}}.story{min-height:165px}.story p{animation:arrive .35s both;margin:8px 0}
+.board{background:radial-gradient(#7a543940 1px,transparent 2px) 0 0/7px 7px,#ad8054;border:10px solid #634330;border-radius:10px;padding:clamp(14px,4vw,36px);box-shadow:inset 0 0 26px #39211155;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(125px,100%),1fr));gap:16px;align-items:center}
+.object{color:#28221d;background:var(--paper);border:0;box-shadow:3px 6px 10px #26160969;position:relative;min-width:0}.tile{min-height:138px;transform:rotate(-3deg);transition:transform .2s;font-weight:bold}.tile:nth-child(even){transform:rotate(3deg)}.tile:hover,.tile:focus-visible{transform:translateY(-5px) rotate(0)}.tile::before{content:"";position:absolute;width:11px;height:11px;background:#922f28;border-radius:50%;box-shadow:2px 2px 3px #0007;top:4px;left:calc(50% - 5px)}.tile .icon{display:block;font-size:2rem;margin:8px}.tile small{display:block}.phone{background:#222a35;color:#fff;border:5px solid #111821;border-radius:18px}.menu{background:#f7e7bd;border:4px double #805c39}.slip{background:#fff8e9;border-radius:0;font-family:ui-monospace,monospace}.survey,.timeline,.notebook{background:repeating-linear-gradient(#faf0d6 0 26px,#d0c4a9 27px 28px)}.timeline{background-color:#ffe7a8}.chat{background:#3b546a;padding:9px 12px;border-radius:13px;margin:6px 0}.receipt{border-block:1px dashed;padding:9px 0}
+dialog{color:var(--ink);background:#29252a;border:1px solid #ae8d61;border-radius:12px;padding:16px;width:min(94vw,650px);max-height:88dvh;overflow:auto;box-shadow:0 18px 60px #000a}dialog[open]{animation:pickup .27s ease-out}dialog::backdrop{background:#11192385}@keyframes pickup{from{opacity:0;transform:translateY(35px) scale(.84)}}.dialog-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.dialog-top h2{margin:8px 0}.sheet{padding:16px;margin:12px 0}.sheet h3{margin-top:0}
+.notebook{position:fixed;right:14px;bottom:14px;width:min(390px,calc(100vw - 28px));max-height:52vh;overflow:auto;color:#33241a;padding:15px;border-radius:8px;box-shadow:0 10px 35px #0009;z-index:2;animation:pickup .28s}.notebook .dialog-top button{flex:none}.written{animation:write .65s ease-out both}@keyframes write{from{clip-path:inset(0 100% 0 0)}}
+.panel{background:#28272c;padding:16px;border:1px solid #ffffff30;border-radius:10px;margin-top:16px}.entry{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.entry input{flex:1;min-width:min(210px,100%);padding:10px;background:#171c24;border:1px solid #a88b65;border-radius:6px;color:var(--ink)}table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{text-align:left;padding:5px;border-bottom:1px solid #a88b65}.key{background:#ffdb86;color:#302115}summary{cursor:pointer}.folder{position:relative;background:#c49759;color:#342517;border-radius:8px;min-height:165px;display:grid;place-items:center;overflow:hidden;animation:folder .75s both}.folder::before{content:"";position:absolute;inset:0;background:#e5b775;transform-origin:top;animation:closefile .65s both}.stamp{z-index:1;border:5px double #8c271f;color:#8c271f;font:bold clamp(1.6rem,7vw,3.5rem) ui-monospace,monospace;padding:4px 12px;transform:rotate(-8deg);animation:stamp .28s .62s both}@keyframes closefile{from{transform:scaleY(0)}}@keyframes folder{from{transform:translateX(-35px) scale(1.07);opacity:0}}@keyframes stamp{from{opacity:0;transform:rotate(-14deg) scale(1.6)}}@media(prefers-reduced-motion:reduce){*,*::before{animation:none!important;transition:none!important}}
+
+.scene{min-height:clamp(365px,58vw,510px);display:flex;align-items:flex-start}
+.scene svg{inset:auto 0 0;height:76%;overflow:visible}
+.story{z-index:1;width:100%;min-height:0;padding:clamp(14px,4vw,32px);background:linear-gradient(#171936 0%,#171936c9 75%,transparent);font:clamp(1.12rem,2.6vw,1.65rem)/1.3 Georgia,serif;text-shadow:0 2px 4px #0a0c18}
+.story p{animation:none;margin:0 0 .42em}
+.story p span[aria-hidden]{animation:ink-in .32s var(--delay) both}
+@keyframes ink-in{from{opacity:0;color:var(--gold)}to{opacity:1}}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+#skip{margin-top:14px}
+#game{padding-bottom:45px}
+.notes-launcher{position:fixed;right:14px;bottom:14px;z-index:1;background:#f4e6c8;color:#33241a;font-weight:bold;box-shadow:0 3px 15px #0008}
+#evidenceBody{margin-inline:auto}
+.sheet.phone{max-width:310px;background:#172330;border:8px solid #101319;border-radius:30px;padding:9px 12px 5px;box-shadow:0 0 0 1px #83909d,4px 8px 16px #0008}
+.phone-status,.phone-contact{display:flex;align-items:center;gap:10px}
+.phone-status{justify-content:space-between;font:700 .75rem system-ui;padding:0 8px 5px}
+.phone-contact{border-bottom:1px solid #ffffff28;padding:5px 0 10px;font-weight:bold}
+.phone-contact small{display:block;color:#bdc7d3;font-weight:normal}
+.avatar{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#536e8c}
+.messages .chat{width:fit-content;max-width:90%;font-size:.9rem}
+.messages .chat:nth-child(2){margin-left:auto;background:#236078}
+.phone-home{margin:12px auto 2px;width:80px;height:4px;background:#bcc4cf;border-radius:4px}
+.sheet.menu{max-width:385px;text-align:center;border:7px double #92643d;padding:14px}
+.menu-heading{border-block:1px solid #92643d;padding:9px 0;font-family:Georgia,serif}
+.menu-heading strong{display:block;font-size:clamp(1.35rem,4vw,2.15rem)}
+.menu-heading span,.menu-items h3{font-size:.82rem;text-transform:uppercase;letter-spacing:.11em}
+.menu-items ul{list-style:none;padding:0;margin:.2em 0 .8em}
+.menu-items h3{margin:12px 0 4px}
+.sheet.slip{max-width:310px;clip-path:polygon(0 0,100% 0,100% 97%,97% 100%,94% 97%,91% 100%,88% 97%,85% 100%,82% 97%,79% 100%,76% 97%,73% 100%,70% 97%,67% 100%,64% 97%,61% 100%,58% 97%,55% 100%,52% 97%,49% 100%,46% 97%,43% 100%,40% 97%,37% 100%,34% 97%,31% 100%,28% 97%,25% 100%,22% 97%,19% 100%,16% 97%,13% 100%,10% 97%,7% 100%,4% 97%,0 100%);padding-bottom:22px}
+.receipt-heading{text-align:center;font-size:.8rem}
+.barcode{margin:12px auto 0;width:75%;height:22px;background:repeating-linear-gradient(90deg,#33291f 0 2px,transparent 2px 5px,#33291f 5px 6px,transparent 6px 8px,#33291f 8px 12px,transparent 12px 15px)}
+.sheet.survey,.sheet.timeline{font-family:'Segoe Print','Bradley Hand','Comic Sans MS',cursive;color:#233858;border-left:3px solid #b46462}
+.handwritten{font-weight:bold;font-size:1.25em;transform:rotate(-1deg)}
+
+#evidence.comparing{width:min(97vw,960px)}
+#comparePicker{align-items:center;margin-block:8px}
+#compareSelect{font:inherit;max-width:100%;padding:6px}
+.comparing .evidence-pair{display:grid;grid-template-columns:repeat(2,minmax(235px,1fr));gap:12px;overflow-x:auto;align-items:start}
+.comparing #evidenceBody,.comparing #comparisonBody{width:100%}
+#comparison h3{margin:10px 0 0}
+#comparisonBody{margin-inline:auto}
+#notes p{border-bottom:1px solid #9c795b;padding-bottom:8px}
+.panel a{color:var(--gold)}
+.panel li+li{margin-top:.65em}
+.theory-evidence{display:grid;gap:4px;margin-top:12px;max-width:360px}
+.theory-evidence select,#shareText{font:inherit;padding:8px;max-width:100%;width:100%}
+#roomPanel,#roomMessage{max-width:1050px;margin-inline:auto;padding-inline:16px} #roomMessage:empty{display:none} #roomLink{width:100%;margin-top:8px} .team-found{outline:3px solid #235e55;outline-offset:2px}
+</style>
+</head>
+<body>
+<header><button id="homeButton" class="brand" type="button">Outbreakle</button><div class="controls"><button id="soundButton" aria-pressed="true">Sound on</button><button id="musicButton" aria-pressed="true">Music on</button><button id="helpButton">How to play</button></div></header>
+<aside id="roomPanel" class="panel" hidden aria-label="Multiplayer room">
+<strong>Co-op room · The Midnight Potluck</strong>
+<p>Everyone has their own screen, notes, and guesses. Opened evidence is marked on the team’s board.</p>
+<div class="controls"><button id="roomCopy">Copy invite link</button><button id="roomLeave">Leave room</button></div>
+<input id="roomLink" aria-label="Room invite link" readonly>
+<p id="roomStatus" role="status"></p>
+</aside>
+<p id="roomMessage" role="status"></p>
+<main>
+<section id="home" class="screen home"><div class="eyebrow">The Disease Detective Game</div><h1 tabindex="-1">Outbreakle</h1><p>An outbreak. A trail of clues. Three guesses to find the source. Step into the shoes of an epidemiologist and figure out what the people who got sick had in common.</p><div class="stack"><button id="start" class="primary">Investigate an outbreak</button><button id="multiplayer">Play with friends</button><button id="archiveButton" disabled>Previous cases</button><small id="archiveTip">Unlocks after you complete your first case.</small></div></section>
+<section id="cases" class="screen" hidden><div class="eyebrow">Field office</div><h1 tabindex="-1">Choose a case</h1><div class="case-list"><button id="caseOne" class="primary">Outbreakle #001 · The Midnight Potluck</button><button disabled>Outbreakle #002 · Coming later</button><button disabled>Outbreakle #003 · Coming later</button></div></section>
+<section id="archive" class="screen" hidden><div class="eyebrow">Field office</div><h1 tabindex="-1">Previous cases</h1><button id="archivedCase"></button></section>
+<section id="intro" class="screen" hidden><div class="eyebrow">Outbreakle #001</div><h1 tabindex="-1">The Midnight Potluck</h1>
+<div class="scene">
+<svg viewBox="0 0 780 320" preserveAspectRatio="xMidYMid slice" role="img" aria-label="An evening potluck outdoors under string lights">
+<circle cx="646" cy="58" r="29" fill="#ffdda7"/><path d="M0 214 Q145 145 309 216 T780 208 V320 H0Z" fill="#263b36"/><path d="M0 28 Q380 150 780 25" fill="none" stroke="#211b24" stroke-width="4"/>
+<g fill="#ffc776" class="lamp"><circle cx="75" cy="50" r="6"/><circle cx="176" cy="75" r="6"/><circle cx="283" cy="88" r="6"/><circle cx="393" cy="92" r="6"/><circle cx="505" cy="85" r="6"/><circle cx="617" cy="65" r="6"/><circle cx="730" cy="40" r="6"/></g>
+<g fill="#e9b17c" stroke="#e9b17c" stroke-width="5" stroke-linecap="round">
+<g class="guest"><circle cx="211" cy="172" r="12"/><path d="M211 187v42l-13 30m13-30 14 30m-14-59 25 12m-25-12-15 17" fill="none"/></g>
+<g class="guest"><circle cx="298" cy="155" r="12"/><path d="M298 170v42l-13 28m13-28 14 28m-14-57 22 15m-22-15-16 12" fill="none"/></g>
+<g class="guest"><circle cx="494" cy="166" r="12"/><path d="M494 181v42l-14 27m14-27 13 27m-13-58-22 14m22-14 17 15" fill="none"/></g>
+<g class="guest"><circle cx="563" cy="179" r="12"/><path d="M563 194v42l-13 30m13-30 14 30m-14-58-22 12m22-12 15 17" fill="none"/></g></g>
+<path d="M310 219h160l14 39H297Z" fill="#ae5543"/><path d="M312 256v27m157-27v27" stroke="#c3905a" stroke-width="7"/><ellipse cx="355" cy="218" rx="21" ry="5" fill="#ffe7b5"/><ellipse cx="415" cy="218" rx="24" ry="5" fill="#ffe7b5"/><path d="M375 206h12l-2 12h-8z" fill="#eab261"/>
+</svg><div id="story" class="story" aria-live="polite"></div></div><button id="skip" class="primary">Skip to evidence board</button></section>
+<section id="game" class="screen" hidden>
+<div class="eyebrow">Outbreakle #001</div><h1 tabindex="-1">Evidence board</h1>
+<details id="briefing" class="panel"><summary>Read the case briefing</summary><div id="briefingText"></div></details>
+<p id="counts" aria-live="polite"></p><div id="board" class="board"></div>
+<button id="notesButton" class="notes-launcher">Case notes<span id="pinCount"></span></button>
+<form id="solve" class="panel"><h2>File your theory</h2><label for="guess">What item most likely made people sick?</label><div class="theory-evidence"><label for="theoryEvidence">What convinced you? (optional)</label><select id="theoryEvidence" disabled><option value="">No evidence selected</option></select></div><div class="entry"><input id="guess" maxlength="120" autocomplete="off" required placeholder="Type one item"><button class="primary">Submit guess</button></div><p id="status" role="status"></p></form>
+</section>
+<section id="ending" class="screen" hidden><div class="eyebrow">Outbreakle #001 · The Midnight Potluck</div><h1 tabindex="-1">Case report</h1><div class="folder"><span class="stamp">CASE CLOSED</span></div><div id="result" class="panel"></div>
+<div class="panel"><button id="copyResult" type="button">Copy result</button><p id="shareStatus" role="status"></p><input id="shareText" aria-label="Spoiler-free result" readonly hidden></div><h2>Disease detective debrief</h2><p>You just used the same kinds of clues epidemiologists use to investigate illness across a group. Here’s what each one helped you work out.</p><div id="debrief"></div><p><button id="replay">Replay case</button> <button id="backCases">Back to cases</button></p></section>
+</main>
+<aside id="notebook" class="notebook" hidden aria-labelledby="notesTitle"><div class="dialog-top"><h2 id="notesTitle">Case notes</h2><button id="closeNotes">Close</button></div><div id="notes"></div></aside>
+<dialog id="help" aria-labelledby="helpTitle"><div class="dialog-top"><h2 id="helpTitle">How to play</h2><form method="dialog"><button>Close</button></form></div><ol>
+<li><strong>Choose a case.</strong> Watch the opening scene or skip to the board. You can reread the story under “Read the case briefing.”</li>
+<li><strong>Investigate.</strong> Pick up any evidence card in any order, then choose “Put down” to return to the board. Opening cards doesn’t cost a guess.</li>
+<li><strong>Use hints if you get stuck.</strong> Some cards have a “Show hint” button. A hint points out what to look at and counts separately in your report.</li>
+<li><strong>Keep case notes.</strong> Save a short observation from an open card. Reopen your notebook from the corner to review your notes. Taking notes is optional.</li>
+<li><strong>Compare evidence.</strong> After opening two different cards, reopen either one and choose “Compare cards” in the corner. Pick another card you’ve already read.</li>
+<li><strong>File your theory.</strong> Type one item or short phrase. You can also choose an evidence card that shaped your theory. You can guess whenever you’re ready, and you have three attempts total. After a wrong guess you can keep investigating.</li>
+<li><strong>Read the report.</strong> A correct guess or three wrong guesses ends the case. The report shows the answer, your stats, and how the evidence fits. Find it again under “Previous cases.”</li>
+</ol></dialog>
+<dialog id="evidence" aria-labelledby="evidenceTitle"><div class="dialog-top"><h2 id="evidenceTitle"></h2><div class="controls"><button id="compareButton" type="button" aria-expanded="false" hidden>Compare cards</button><form method="dialog"><button>Put down</button></form></div></div><div id="comparePicker" class="controls" hidden><label for="compareSelect">Compare with</label><select id="compareSelect"></select></div>
+<div class="evidence-pair"><div id="evidenceBody"></div><section id="comparison" hidden><h3 id="comparisonTitle"></h3><div id="comparisonBody"></div></section></div><div class="controls"><button id="pin">Save observation</button><button id="hintButton">Show hint</button></div><p id="hintText" hidden></p></dialog>
+<script>
+// BEGIN GENERATED POTLUCK DATA
+const potluck = {
+  "total": 12,
+  "sick": 7,
+  "survey": [
+    [
+      "Chicken skewers",
+      4,
+      7,
+      3,
+      5
+    ],
+    [
+      "Lemonade",
+      4,
+      6,
+      3,
+      6
+    ],
+    [
+      "Iced coffee",
+      3,
+      5,
+      4,
+      7
+    ],
+    [
+      "Added ice",
+      7,
+      8,
+      0,
+      4
+    ]
+  ]
+};
+// END GENERATED POTLUCK DATA
+const survey = potluck.survey;
+const [, iceSick, iceTotal, noIceSick, noIceTotal] = survey[3];
+const iceComparison = iceSick + ' of ' + iceTotal + ' guests who had ice got sick (' +
+  (100 * iceSick / iceTotal).toFixed(1) + '%), compared with ' + noIceSick + ' of ' +
+  noIceTotal + ' who skipped it (' + (100 * noIceSick / noIceTotal).toFixed(1) + '%).';
+function surveyTable(highlight = false) {
+  return '<table><thead><tr><th scope="col">Item</th><th scope="col">Had it<br>Sick / total</th><th scope="col">Skipped it<br>Sick / total</th></tr></thead><tbody>' +
+    survey.map(([item, sick, total, otherSick, otherTotal], index) =>
+      '<tr' + (highlight && index === 3 ? ' class="key"' : '') + '><th scope="row">' + item + '</th><td>' + sick + ' / ' + total + '</td><td>' + otherSick + ' / ' + otherTotal + '</td></tr>'
+    ).join('') + '</tbody></table>';
+}
+const cards = [
+  {title:'Group chat', body:'<p class="chat"><b>Maya:</b> I swear it was the chicken.</p><p class="chat"><b>Sam:</b> I’m vegetarian and I’m sick too.</p><p class="chat"><b>Jo:</b> Same here. I missed dinner and only grabbed an iced coffee.</p>'},
+  {title:'Menu board', body:'<p>Chicken skewers · Veggie wraps · Brownies</p><p>Lemonade and cold-brew coffee were served at separate tables. Both drinks were available with or without added ice.</p>'},
+  {title:'Supply receipt', body:'<p class="receipt">1 × party ice bag<br>Pickup · Saturday 6:45 p.m.</p><p>Volunteer note: “Split the bag between the lemonade and coffee tables.”</p>', hint:'What did the two drink stations share?'},
+  {title:'Guest survey', body:'<p>All ' + potluck.total + ' guests replied. Some had more than one menu item.</p>' + surveyTable(), hint:'Compare each row’s “Had it” and “Skipped it” columns. Which item did every sick guest have?'},
+  {title:'Timeline', body:'<p><b>Saturday 7:00 p.m.</b> Dinner opens.</p><p><b>8:15 p.m.</b> Dessert and drink tables are still open.</p><p><b>Sunday morning–afternoon</b> ' + potluck.sick + ' guests report feeling sick.</p>'}
+];
+const aliases = new Set(['ice','the ice','ice bag','the ice bag','bag of ice','the bag of ice','shared ice','the shared ice','added ice','contaminated ice','ice cubes','the ice cubes','the ice from the shared bag','ice from the shared bag','shared bag of ice','the shared bag of ice']);
+const normalize = value => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
+const byId = id => document.getElementById(id);
+const briefing = [
+  'Saturday night, ' + potluck.total + ' guests gathered outside for a campus potluck.',
+  'By Sunday afternoon, ' + potluck.sick + ' had reported feeling sick.',
+  'In the group chat, everyone has a theory. What did the sick guests have in common?'
+];
+const props = ['phone','menu','slip','survey','timeline'];
+const icons = ['▤','☷','▥','✎','◷'];
+const explanations = [
+  ['Generate hypotheses', 'Guest stories give you leads to test. Maya suspected the chicken, but Sam got sick without eating it, so chicken alone couldn’t account for every illness. Jo’s coffee order gave you another lead. An investigator would ask every guest the same questions so the loudest theory in the chat doesn’t drive the investigation.'],
+  ['Define the exposures', 'An exposure is something a person came into contact with. The menu shows why “What did you drink?” is only half the question. Someone who ordered lemonade and someone who ordered coffee could both have had the same ice. Recording the drink and the added ice separately lets you test that idea.'],
+  ['Trace a shared ingredient', 'The receipt shows one bag was picked up. The volunteer note links it to both stations. Together, they explain how guests who ordered different drinks could share an exposure. An investigator would follow the bag from pickup to serving and check what else the stations shared, including scoops or containers.'],
+  ['Compare attack rates', 'An attack rate is the proportion of people in a group who became ill during the outbreak. ' + iceComparison + ' Including the guests who stayed well is what lets you make that comparison. It’s a strong lead in this small group, and another exposure shared by ice users could still explain the pattern.'],
+  ['Put illnesses in time order', 'The Sunday reports tell you when guests spoke up. To build an epidemic curve, a chart of new illnesses by when symptoms started, an investigator would ask each guest for their first symptom and its start time. A cluster after the potluck could support a shared exposure, depending on the timing and the suspected cause.']
+];
+function loadReport() {
+  try { return JSON.parse(localStorage.getItem('outbreakle-case-001')); }
+  catch { return null; }
+}
+let report = loadReport();
+let screen = 'home', timers = [], activeCard = 0, audio, soundEnabled = true;
+let musicEnabled = true, musicTimer, musicGain;
+const midnightJazz = [
+  {bass:[36,43], chord:[60,63,67,70], lead:[67,70,72,75]},
+  {bass:[41,48], chord:[57,60,63,67], lead:[72,70,67,65]},
+  {bass:[38,45], chord:[60,65,68,72], lead:[65,68,72,74]},
+  {bass:[43,50], chord:[59,62,65,68], lead:[74,72,68,67]}
+];
+function stopMusic() {
+  clearInterval(musicTimer);
+  musicTimer = undefined;
+  if (musicGain) musicGain.disconnect();
+  musicGain = undefined;
+}
+function startMusic() {
+  if (!musicEnabled || musicTimer !== undefined) return;
+  try {
+    audio ??= new (window.AudioContext || window.webkitAudioContext)();
+    if (audio.state === 'suspended') audio.resume().catch(() => {});
+    musicGain = audio.createGain();
+    musicGain.gain.value = .22;
+    musicGain.connect(audio.destination);
+    let measure = 0;
+    let next = audio.currentTime + .08;
+    const beat = .64;
+    function playNote(note, when, length, volume, type) {
+      const tone = audio.createOscillator(), envelope = audio.createGain();
+      tone.type = type;
+      tone.frequency.value = 440 * 2 ** ((note - 69) / 12);
+      envelope.gain.setValueAtTime(.001, when);
+      envelope.gain.exponentialRampToValueAtTime(volume, when + .026);
+      envelope.gain.exponentialRampToValueAtTime(.001, when + length);
+      tone.connect(envelope).connect(musicGain);
+      tone.start(when);
+      tone.stop(when + length);
+    }
+    function schedule() {
+      if (next < audio.currentTime) next = audio.currentTime + .08;
+      if (next > audio.currentTime + .25) return;
+      const bar = midnightJazz[measure++ % midnightJazz.length];
+      bar.bass.forEach((note,i) => playNote(note,next + i * beat * 2,.72,.19,'sine'));
+      bar.chord.forEach((note,i) => {
+        playNote(note,next + .04 * i,.82,.045,'sine');
+        playNote(note,next + beat * 2.65 + .018 * i,.47,.028,'sine');
+      });
+      bar.lead.forEach((note,i) => playNote(note,next + beat * [0.66,1.35,2.2,3.15][i],.38,.055,'triangle'));
+      next += beat * 4;
+    }
+    schedule();
+    musicTimer = setInterval(schedule, 100);
+  } catch { stopMusic(); }
+}
+let guesses = 0, opened = new Set(), hints = new Set(), pins = new Set();
+function sound(kind) {
+  if (!soundEnabled) return;
+  try {
+    audio ??= new (window.AudioContext || window.webkitAudioContext)();
+    if (audio.state === 'suspended') audio.resume().catch(() => {});
+    const now = audio.currentTime;
+    const gain = audio.createGain();
+    gain.connect(audio.destination);
+    const duration = {whoosh:.22, pencil:.38, wrong:.23, stamp:.28}[kind];
+    gain.gain.setValueAtTime(.001, now);
+    gain.gain.exponentialRampToValueAtTime(kind === 'pencil' ? .1 : .19, now + .025);
+    gain.gain.exponentialRampToValueAtTime(.001, now + duration);
+    if (kind === 'whoosh' || kind === 'pencil') {
+      const buffer = audio.createBuffer(1, Math.ceil(audio.sampleRate * duration), audio.sampleRate);
+      const samples = buffer.getChannelData(0);
+      for (let i = 0; i < samples.length; i++) samples[i] = (Math.random() * 2 - 1) * (kind === 'pencil' ? Math.abs(Math.sin(i / 450)) : 1);
+      const noise = audio.createBufferSource(), filter = audio.createBiquadFilter();
+      noise.buffer = buffer;
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(kind === 'pencil' ? 2300 : 900, now);
+      if (kind === 'whoosh') filter.frequency.exponentialRampToValueAtTime(260, now + duration);
+      noise.connect(filter).connect(gain);
+      noise.start();
+    } else {
+      const tone = audio.createOscillator();
+      tone.type = kind === 'wrong' ? 'triangle' : 'sine';
+      tone.frequency.setValueAtTime(kind === 'wrong' ? 170 : 140, now);
+      tone.frequency.exponentialRampToValueAtTime(kind === 'wrong' ? 95 : 45, now + duration);
+      tone.connect(gain);
+      tone.start();
+      tone.stop(now + duration);
+    }
+  } catch { /* Play remains available when audio is unavailable. */ }
+}
+function navigate(id) {
+  timers.forEach(clearTimeout);
+  timers = [];
+  byId(screen).hidden = true;
+  byId('notebook').hidden = true;
+  screen = id;
+  if (!['intro','game','ending'].includes(id)) stopMusic();
+  byId(id).hidden = false;
+  byId(id).querySelector('h1').focus({preventScroll:true});
+  window.scrollTo(0, 0);
+}
+function updateArchive() {
+  byId('archiveButton').disabled = !report;
+  byId('archiveTip').hidden = Boolean(report);
+  byId('archivedCase').textContent = 'Outbreakle #001 · The Midnight Potluck' +
+    (report?.correct ? ' · Solved' : ' · Completed');
+}
+function begin() {
+  guesses = 0;
+  opened.clear(); hints.clear(); pins.clear();
+  byId('solve').reset();
+  byId('briefing').open = false;
+  byId('status').textContent = '3 guesses left.';
+  updateCounts();
+  renderNotes();
+  navigate('intro');
+  startMusic();
+  sound('whoosh');
+  const story = byId('story');
+  story.replaceChildren();
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  briefing.forEach((sentence, index) => {
+    const add = () => {
+      const paragraph = document.createElement('p');
+      const spoken = document.createElement('span');
+      spoken.className = 'sr-only';
+      spoken.textContent = sentence;
+      paragraph.append(spoken);
+      Array.from(sentence).forEach((letter, index) => {
+        const glyph = document.createElement('span');
+        glyph.setAttribute('aria-hidden', 'true');
+        glyph.style.setProperty('--delay', index * 13 + 'ms');
+        glyph.textContent = letter;
+        paragraph.append(glyph);
+      });
+      story.append(paragraph);
+    };
+    if (reduced || index === 0) add();
+    else timers.push(setTimeout(add, index * 5000));
+  });
+  if (!reduced) timers.push(setTimeout(() => { byId('skip').textContent = 'Open evidence board'; }, 12000));
+  byId('skip').textContent = reduced ? 'Open evidence board' : 'Skip to evidence board';
+}
+function updateCounts() {
+  markTeamEvidence();
+  const picker = byId('theoryEvidence');
+  const selection = picker.value;
+  picker.replaceChildren(new Option('No evidence selected', ''));
+  for (const index of opened) picker.add(new Option(cards[index].title, index));
+  picker.value = selection;
+  picker.disabled = opened.size === 0;
+  byId('counts').textContent = opened.size + '/5 evidence cards opened · ' + hints.size + ' hints used';
+  [...byId('board').children].forEach((tile, index) => {
+    tile.querySelector('small').textContent = pins.has(index) ? 'Noted' : opened.has(index) ? 'Read' : 'Unopened';
+  });
+}
+const observations = [
+  'Sam skipped the chicken and still got sick. Jo only stopped by for coffee.',
+  'Guests could get either drink with or without added ice.',
+  'One bag was split between the two drink stations.',
+  'Compare how many got sick among guests who had each item and guests who skipped it.',
+  'Guests reported illness on Sunday. The timeline doesn’t say exactly when symptoms began.'
+];
+function renderNotes(newPin) {
+  byId('pinCount').textContent = ' · ' + pins.size;
+  byId('notes').innerHTML = pins.size ? [...pins].map(index =>
+    '<p class="' + (newPin === index ? 'written' : '') + '"><strong>' + cards[index].title + '</strong><br>' + observations[index] + '</p>'
+  ).join('') : '<p>Your notebook is empty. Save an observation from any open card.</p>';
+}
+function propBody(index) {
+  const body = cards[index].body;
+  const wrappers = [
+    '<div class="phone-status"><span>10:42</span><span>▴ ▰</span></div><div class="phone-contact"><span class="avatar">P</span><div>Potluck crew<small>Group messages</small></div></div><div class="messages">' + body + '</div><div class="phone-home"></div>',
+    '<div class="menu-heading"><span>Saturday night</span><strong>Campus Potluck</strong><span>Food & drinks</span></div><div class="menu-items"><h3>From the table</h3><ul><li>Chicken skewers</li><li>Veggie wraps</li><li>Brownies</li></ul><h3>From the drinks stations</h3><ul><li>Lemonade</li><li>Cold-brew coffee</li></ul><p>Both drinks available with or without added ice.</p></div>',
+    '<div class="receipt-heading"><strong>CAMPUS CORNER MARKET</strong><br>PICKUP RECEIPT</div>' + body + '<div class="barcode" aria-hidden="true"></div>',
+    '<div class="handwritten">Guest survey · Sunday</div>' + body,
+    '<div class="handwritten">My potluck timeline</div>' + body
+  ];
+  return wrappers[index];
+}
+function refreshPin() {
+  byId('pin').textContent = pins.has(activeCard) ? 'Remove observation' : 'Save observation';
+  byId('pin').setAttribute('aria-pressed', String(pins.has(activeCard)));
+}
+function resetComparison(revisiting) {
+  const button = byId('compareButton');
+  button.hidden = !revisiting || opened.size < 2;
+  button.textContent = 'Compare cards';
+  button.setAttribute('aria-expanded', 'false');
+  byId('comparePicker').hidden = true;
+  byId('comparison').hidden = true;
+  byId('evidence').classList.remove('comparing');
+  byId('compareSelect').replaceChildren(new Option('Choose an opened card', ''));
+  opened.forEach(index => {
+    if (index !== activeCard) byId('compareSelect').add(new Option(cards[index].title, index));
+  });
+}
+byId('compareButton').onclick = () => {
+  const picker = byId('comparePicker'), button = byId('compareButton');
+  if (!picker.hidden) {
+    resetComparison(true);
+    return;
+  }
+  picker.hidden = false;
+  button.textContent = 'Close comparison';
+  button.setAttribute('aria-expanded', 'true');
+  byId('compareSelect').focus();
+};
+byId('compareSelect').onchange = event => {
+  const index = Number(event.target.value);
+  const selected = event.target.value !== '';
+  byId('comparison').hidden = !selected;
+  byId('evidence').classList.toggle('comparing', selected);
+  if (!selected) return;
+  byId('comparisonTitle').textContent = cards[index].title;
+  byId('comparisonBody').className = 'object sheet ' + props[index];
+  byId('comparisonBody').innerHTML = propBody(index);
+  sound('whoosh');
+};
+function openCard(index) {
+  activeCard = index;
+  const card = cards[index];
+  const revisiting = opened.has(index);
+  opened.add(index);
+  shareDiscovery(index);
+  resetComparison(revisiting);
+  updateCounts();
+  byId('evidenceTitle').textContent = card.title;
+  byId('evidenceBody').className = 'object sheet ' + props[index];
+  byId('evidenceBody').innerHTML = propBody(index);
+  byId('hintButton').hidden = !card.hint;
+  byId('hintButton').textContent = 'Show hint';
+  byId('hintButton').setAttribute('aria-expanded','false');
+  byId('hintText').textContent = card.hint ?? '';
+  byId('hintText').hidden = true;
+  refreshPin();
+  sound('whoosh');
+  byId('evidence').showModal();
+}
+const evidenceFeedback = [
+  'The chat made it worth looking beyond the chicken. Guest stories give you leads that you can test with the survey.',
+  'The menu let you separate the drinks from the ice. The survey tested whether that distinction mattered.',
+  'The receipt linked the two drink stations. The survey showed that illness was more common among guests who had ice.',
+  'The survey let you compare people who had ice with those who skipped it. Including guests who stayed well made that comparison possible.',
+  'The timeline put the reports after the potluck. Exact symptom onset times would help test whether guests shared an exposure.'
+];
+function showReport() {
+  byId('shareText').hidden = true;
+  byId('shareStatus').textContent = '';
+  navigate('ending');
+  const score = report.correct ? 'Solved in ' + report.guesses + (report.guesses === 1 ? ' guess' : ' guesses') : 'Completed · Out of guesses';
+  byId('result').innerHTML = '<h2>The shared ice</h2><p>' + score + ' · ' + report.opened + '/5 evidence cards opened · ' + report.hints + ' hints used</p>' +
+    '<p>Both drink stations used the <mark>same bag of ice</mark>. ' + iceComparison + ' The shared ice is the strongest lead.</p>' + surveyTable(true);
+  if (Number.isInteger(report.evidence) && evidenceFeedback[report.evidence]) {
+    const feedback = document.createElement('p');
+    feedback.textContent = 'Your evidence · ' + cards[report.evidence].title + '. ' + evidenceFeedback[report.evidence];
+    byId('result').append(feedback);
+  }
+}
+cards.forEach((card, index) => {
+  const tile = document.createElement('button');
+  tile.className = 'object tile ' + props[index];
+  tile.innerHTML = '<span class="icon" aria-hidden="true">' + icons[index] + '</span>' + card.title + '<small>Unopened</small>';
+  tile.addEventListener('click', () => openCard(index));
+  byId('board').append(tile);
+});
+byId('briefingText').innerHTML = briefing.map(line => '<p>' + line + '</p>').join('');
+byId('debrief').innerHTML = cards.map((card, index) => {
+  const [method, explanation] = explanations[index];
+  return '<details class="panel"><summary>' + card.title + ' · ' + method + '</summary><p>' + explanation + '</p></details>';
+}).join('') + `
+  <div class="panel">
+    <h3>How an epidemiologist would investigate the potluck</h3>
+    <ol>
+      <li><strong>Decide who counts as a case.</strong> Ask what symptoms guests had and when they began. Use that information to set a consistent rule based on symptoms, timing, and potluck attendance.</li>
+      <li><strong>Build a guest list.</strong> Make a table with one row per guest, including people who stayed well. Record each food and drink exposure, symptoms, and onset time. This is called a <em>line list</em>.</li>
+      <li><strong>Test the ice theory.</strong> Since you know who attended, you can compare illness rates among guests who had or skipped each item. That’s a <em>retrospective cohort study</em>. Check whether ice still looks like the strongest lead when you compare people who ordered the same drink, if there are enough guests to do so.</li>
+      <li><strong>Check the source and prevent more illness.</strong> Trace how the ice was handled. Public health staff could check for leftover samples or arrange testing if appropriate. If any of the suspected ice is still being served, they could ask organizers to stop using it while they investigate.</li>
+    </ol>
+    <p><strong>Your conclusion:</strong> The shared ice is the best-supported source in this fictional case. The survey leaves open whether the ice itself, a scoop, or another shared exposure caused the illness.</p>
+    <p><a href="https://www.cdc.gov/field-epi-manual/php/chapters/field-investigation.html" target="_blank" rel="noopener noreferrer">Read more in the CDC Field Epidemiology Manual</a></p>
+  </div>`;
+
+byId('homeButton').onclick = () => navigate('home');
+byId('start').onclick = () => navigate('cases');
+byId('archiveButton').onclick = () => navigate('archive');
+byId('copyResult').onclick = async () => {
+  const outcome = report.correct ? 'Solved in ' + report.guesses + '/3 guesses' : 'Completed · 3/3 guesses used';
+  const summary = 'Outbreakle #001 · ' + outcome + ' · ' + report.opened +
+    '/5 cards opened · ' + report.hints + (report.hints === 1 ? ' hint' : ' hints');
+  const field = byId('shareText');
+  try {
+    await navigator.clipboard.writeText(summary);
+    field.hidden = true;
+    byId('shareStatus').textContent = 'Spoiler-free result copied.';
+  } catch {
+    field.hidden = false;
+    field.value = summary;
+    field.select();
+    byId('shareStatus').textContent = 'Select and copy your result below.';
+  }
+};
+byId('archivedCase').onclick = showReport;
+byId('caseOne').onclick = begin;
+byId('replay').onclick = begin;
+byId('backCases').onclick = () => navigate('cases');
+byId('skip').onclick = () => { sound('whoosh'); navigate('game'); };
+byId('helpButton').onclick = () => byId('help').showModal();
+byId('musicButton').onclick = () => {
+  musicEnabled = !musicEnabled;
+  byId('musicButton').textContent = musicEnabled ? 'Music on' : 'Music off';
+  byId('musicButton').setAttribute('aria-pressed', String(musicEnabled));
+  if (!musicEnabled) stopMusic();
+  else if (['intro','game','ending'].includes(screen)) startMusic();
+};
+byId('soundButton').onclick = () => {
+  soundEnabled = !soundEnabled;
+  byId('soundButton').textContent = soundEnabled ? 'Sound on' : 'Sound off';
+  byId('soundButton').setAttribute('aria-pressed', String(soundEnabled));
+};
+byId('evidence').addEventListener('close', () => sound('whoosh'));
+byId('evidence').addEventListener('click', event => {
+  const dialog = byId('evidence');
+  if (event.target !== dialog) return;
+  const box = dialog.getBoundingClientRect();
+  if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) dialog.close();
+});
+byId('hintButton').onclick = () => {
+  const hint = byId('hintText');
+  hint.hidden = !hint.hidden;
+  byId('hintButton').textContent = hint.hidden ? 'Show hint' : 'Hide hint';
+  byId('hintButton').setAttribute('aria-expanded', String(!hint.hidden));
+  if (!hint.hidden) { hints.add(activeCard); updateCounts(); }
+};
+byId('pin').onclick = () => {
+  const adding = !pins.has(activeCard);
+  if (adding) pins.add(activeCard);
+  else pins.delete(activeCard);
+  refreshPin();
+  updateCounts();
+  renderNotes(adding ? activeCard : undefined);
+  if (adding) {
+    byId('evidence').close();
+    byId('notebook').hidden = false;
+    byId('closeNotes').focus();
+    setTimeout(() => sound('pencil'), 190);
+  }
+};
+byId('notesButton').onclick = () => {
+  byId('notebook').hidden = false;
+  byId('closeNotes').focus();
+  sound('whoosh');
+};
+byId('closeNotes').onclick = () => {
+  byId('notebook').hidden = true;
+  byId('notesButton').focus();
+  sound('whoosh');
+};
+byId('solve').addEventListener('submit', event => {
+  event.preventDefault();
+  if (screen !== 'game' || guesses >= 3) return;
+  const input = byId('guess'), answer = normalize(input.value);
+  if (!answer) { byId('status').textContent = 'Type an item to use a guess.'; return; }
+  guesses++;
+  const correct = aliases.has(answer);
+  if (!correct) sound('wrong');
+  if (!correct && guesses < 3) {
+    byId('status').textContent = 'That theory didn’t hold up. ' + (3 - guesses) + (guesses === 2 ? ' guess left.' : ' guesses left.');
+    input.select();
+    return;
+  }
+  const evidence = byId('theoryEvidence').value;
+  report = {correct, guesses, opened:opened.size, hints:hints.size,
+    evidence: evidence === '' ? null : Number(evidence)};
+  try { localStorage.setItem('outbreakle-case-001', JSON.stringify(report)); } catch {}
+  updateArchive();
+  showReport();
+  if (correct) setTimeout(() => sound('stamp'), 620);
+});
+updateArchive();
+
+let roomCode = null, roomPoll, roomRevision = 0;
+const teamOpened = new Set(), pendingDiscoveries = new Set();
+
+function markTeamEvidence() {
+  [...byId('board').children].forEach((tile, index) => {
+    tile.classList.toggle('team-found', teamOpened.has(index));
+    let marker = tile.querySelector('.team-label');
+    if (!marker) {
+      marker = document.createElement('span');
+      marker.className = 'team-label';
+      tile.append(marker);
+    }
+    marker.textContent = teamOpened.has(index) ? ' · Team found' : '';
+  });
+}
+
+async function roomRequest(path, method = 'GET') {
+  const response = await fetch('/api/rooms' + path, {method, cache:'no-store'});
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Room unavailable.');
+  return data;
+}
+
+function applyRoom(data) {
+  for (const index of data.opened) teamOpened.add(index);
+  markTeamEvidence();
+  byId('roomStatus').textContent = 'Team evidence: ' + teamOpened.size + '/5';
+}
+
+async function syncRoom() {
+  const code = roomCode, revision = roomRevision;
+  if (!code) return;
+  try {
+    for (const index of pendingDiscoveries) {
+      const data = await roomRequest('/' + code + '/evidence/' + index, 'POST');
+      if (revision !== roomRevision) return;
+      pendingDiscoveries.delete(index);
+      applyRoom(data);
+    }
+    const data = await roomRequest('/' + code);
+    if (revision === roomRevision) applyRoom(data);
+  } catch (error) {
+    if (revision === roomRevision) byId('roomStatus').textContent = error.message + ' You can keep playing on your screen.';
+  }
+}
+
+function shareDiscovery(index) {
+  if (roomCode && !teamOpened.has(index)) pendingDiscoveries.add(index);
+}
+
+async function enterRoom(code) {
+  const button = byId('multiplayer');
+  button.disabled = true;
+  try {
+    const data = await roomRequest(code ? '/' + encodeURIComponent(code) : '', code ? 'GET' : 'POST');
+    roomCode = data.code;
+    roomRevision++;
+    const link = new URL(location.href);
+    link.searchParams.set('room', roomCode);
+    history.replaceState(null, '', link);
+    byId('roomLink').value = link.href;
+    byId('roomPanel').hidden = false;
+    byId('roomMessage').textContent = '';
+    applyRoom(data);
+    roomPoll = setInterval(syncRoom, 1500);
+    if (screen === 'home') navigate('cases');
+  } catch {
+    byId('roomMessage').textContent = 'Could not open the room. Multiplayer needs the Outbreakle room server and a valid invite. Solo play is available.';
+  } finally {
+    button.disabled = Boolean(roomCode);
+  }
+}
+
+byId('multiplayer').onclick = () => enterRoom();
+byId('roomCopy').onclick = async () => {
+  const link = byId('roomLink');
+  try { await navigator.clipboard.writeText(link.value); }
+  catch { link.focus(); link.select(); }
+};
+byId('roomLeave').onclick = () => {
+  clearInterval(roomPoll);
+  roomCode = null;
+  roomRevision++;
+  teamOpened.clear();
+  pendingDiscoveries.clear();
+  markTeamEvidence();
+  byId('roomPanel').hidden = true;
+  byId('multiplayer').disabled = false;
+  const link = new URL(location.href);
+  link.searchParams.delete('room');
+  history.replaceState(null, '', link);
+  navigate('home');
+};
+const invite = new URLSearchParams(location.search).get('room');
+if (invite) enterRoom(invite);
+</script>
+</body>
+</html>
