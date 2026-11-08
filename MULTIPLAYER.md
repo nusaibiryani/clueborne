@@ -1,13 +1,23 @@
-# Outbreakle multiplayer
+# Outbreakle
+Run `python3 room_server.py` and open http://localhost:8000.
+On Render use build command `python -m py_compile room_server.py` and start command `python room_server.py`.
 
-Solo play works by opening outbreakle.html. For co-op, run python3 room_server.py
-and visit http://localhost:8000. Choose Play with friends and copy the invite.
-Use two browser tabs to test. Everyone uses their own screen, notes and guesses.
-Evidence opened in one browser appears as Team found on the other board.
+Upload all five project files to replace the earlier version.
+The HTML and server must be deployed together because the room API has changed.
+Rooms are held in server memory. Restarting or redeploying the service expires active rooms.
+Completed history and personal progress are stored in each browser. Clearing site data removes them.
+Head-to-head leaderboards are saved when all room members have finished and the player's browser receives the result.
+Team clocks continue while one member pauses. Solo and race clocks count active time.
+Names are display names, without accounts or cross-device synchronization.
+Only Case 001 is currently playable.
 
-For friends on other networks, deploy this folder to a host that runs a Python
-web service, with python3 room_server.py as the start command. Use a single
-server instance and open the deployed HTTPS URL before creating an invite.
-A localhost link only works on your own device. GitHub Pages can serve solo
-play but cannot run the room server. Rooms are stored in memory and disappear
-when the server restarts or after six hours without activity.
+## Data
+The 12 guest records are synthetic. Run `python3 build_case.py` after editing potluck_guests.csv.
+The script produces guest details and the exposure counts used by the debrief.
+Review narrative clues manually after changing records.
+The client-side answer is inspectable. Competition is informal and based on trust.
+
+## Validation
+Python and JavaScript syntax checks passed. Server logic checks covered shared evidence deduplication,
+host-only team guesses, proposals, race joins and separate player results.
+A full browser playthrough, mobile visual audit and live multiplayer test are still required.
