@@ -87,7 +87,7 @@ class Handler(BaseHTTPRequestHandler):
             if action == "create" and not code:
                 code = secrets.token_hex(12)
                 ROOMS[code] = dict(code=code, mode=data.get("mode", "team"), team=str(data.get("team", "Detectives"))[:40],
-                    host=player, players={}, opened=[], hints=[], guesses=0, started=None, result=None, race_ended=False)
+                    host=player, players={}, proposals={}, opened=[], hints=[], guesses=0, started=None, result=None, race_ended=False)
             room = ROOMS.get(code)
             if not room:
                 return self.reply(404, {"error": "This room has expired. Your saved results remain in case history."})
@@ -110,27 +110,46 @@ class Handler(BaseHTTPRequestHandler):
             member = room["players"][player]
             if room["mode"] == "race" and member["result"] is None and "progress" in data:
                 member["progress"] = progress_stats(data)
+            if action in ("propose", "remove_proposal", "guess"):
+                if room["mode"] != "team":
+                    return self.reply(400, {"error": "Proposals are only available in Team Investigation."})
+                if not room["started"] or room["result"]:
+                    return self.reply(409, {"error": "The team investigation is not accepting theories."})
+                proposals = room.setdefault("proposals", {})
             if action == "propose":
-                room["message"] = ""
-                room["proposal"] = member["name"] + " suggests " + str(data.get("answer", ""))[:120] + " · " + str(data.get("reason", ""))[:40]
+                evidence, reason = data.get("evidence"), data.get("reason")
+                answer = str(data.get("answer", "")).strip()[:120]
+                if not answer or type(evidence) is not int or evidence not in room["opened"] or reason not in REASONS:
+                    return self.reply(400, {"error": "Enter a source, choose an opened clue, and select supporting reasoning."})
+                proposals[player] = dict(id=secrets.token_hex(12), player=player, name=member["name"],
+                    answer=answer, evidence=evidence, reason=reason, submissions=0)
+            if action == "remove_proposal":
+                owner = next((key for key, proposal in proposals.items() if proposal["id"] == data.get("proposalId")), None)
+                if owner is None:
+                    return self.reply(409, {"error": "That theory was removed or replaced. Choose a current theory."})
+                if player not in (owner, room["host"]):
+                    return self.reply(403, {"error": "You can only remove your own theory. The host can remove any theory."})
+                del proposals[owner]
             if action == "guess":
-                if room["mode"] != "team" or player != room["host"]:
+                if player != room["host"]:
                     return self.reply(403, {"error": "The host submits the team theory."})
-                evidence = data.get("evidence")
-                reason = data.get("reason")
-                if type(evidence) is not int or evidence not in room["opened"] or reason not in REASONS:
-                    return self.reply(400, {"error": "Choose an opened clue and supporting reasoning."})
-                if room["started"] and not room["result"]:
-                    room["proposal"] = ""
-                    room["guesses"] += 1
-                    answer_correct = data.get("answer") in ANSWERS
-                    reasoning_correct = REASONS[evidence] == reason
-                    correct = answer_correct and reasoning_correct
-                    if correct or room["guesses"] == 3:
-                        room["result"] = dict(correct=correct, guesses=room["guesses"], opened=len(room["opened"]),
-                            hints=len(room["hints"]), elapsed=int(time()*1000)-room["started"], evidence=evidence,
-                            reason=reason, answerCorrect=answer_correct, reasoningCorrect=reasoning_correct)
-                    room["message"] = "That theory and supporting reasoning didn’t hold up. " + str(3-room["guesses"]) + " guesses remaining." if not correct else ""
+                proposal = next((item for item in proposals.values() if item["id"] == data.get("proposalId")), None)
+                if proposal is None:
+                    return self.reply(409, {"error": "That theory was removed or replaced. Choose a current theory."})
+                if type(data.get("expectedGuesses")) is not int or data["expectedGuesses"] != room["guesses"]:
+                    return self.reply(409, {"error": "The team guess count changed. Review the latest result before submitting again."})
+                evidence, reason = proposal["evidence"], proposal["reason"]
+                room["guesses"] += 1
+                proposal["submissions"] += 1
+                answer = re.sub(r"[^a-z0-9]+", " ", proposal["answer"].lower()).strip()
+                answer_correct = answer in ANSWERS
+                reasoning_correct = REASONS[evidence] == reason
+                correct = answer_correct and reasoning_correct
+                if correct or room["guesses"] == 3:
+                    room["result"] = dict(correct=correct, guesses=room["guesses"], opened=len(room["opened"]),
+                        hints=len(room["hints"]), elapsed=int(time()*1000)-room["started"], evidence=evidence,
+                        reason=reason, answerCorrect=answer_correct, reasoningCorrect=reasoning_correct)
+                room["message"] = "That theory and supporting reasoning didn’t hold up. " + str(3-room["guesses"]) + " guesses remaining." if not correct else ""
             if action == "result" and room["mode"] == "race":
                 result = data.get("result")
                 if not room["started"]:
@@ -146,6 +165,7 @@ class Handler(BaseHTTPRequestHandler):
                 for racer in room["players"].values():
                     finalize_racer(racer, "ended")
             if action == "leave":
+                room.get("proposals", {}).pop(player, None)
                 if room["mode"] == "race" and room["started"]:
                     finalize_racer(member, "withdrawn")
                     member["left"] = True

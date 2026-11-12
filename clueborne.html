@@ -355,6 +355,18 @@ header .brand { display:inline-flex; align-items:center; gap:9px; }
 #roomPanel #roomTitle { font-family:Georgia,serif; font-size:1.25rem; }
 #cancelMultiplayer { margin-top:20px; }
 header .controls:has(#roomButton:not([hidden])) { display:flex; flex-wrap:wrap; width:auto; }
+#teamProposals { margin-top:20px; }
+#teamProposals h2 { margin-top:0; }
+.proposal-card { position:relative; display:flex; align-items:flex-start; gap:12px; padding:18px; padding-right:60px; margin:12px 0; border:1px solid #ffffff26; border-radius:12px; background:#171c2480; overflow-wrap:anywhere; }
+.proposal-card:has(input:checked) { border-color:var(--gold); background:#f6bb6910; }
+.proposal-card input { margin-top:8px; flex:none; accent-color:var(--gold); width:20px; height:20px; }
+.proposal-card label { display:block; cursor:pointer; min-width:0; flex:1; }
+.proposal-card strong { display:block; font:700 1.25rem Georgia,serif; color:var(--gold); }
+.proposal-card p { margin:6px 0; }
+.proposal-card small { display:block; color:#d0c2ae; }
+.proposal-remove { position:absolute; top:8px; right:8px; width:44px; height:44px; padding:0; border:0; background:transparent; font-size:1.6rem; }
+#hostGuessControls { margin-top:20px; border-top:1px solid #ffffff26; padding-top:12px; }
+#proposalStatus { color:var(--gold); }
 </style>
 </head>
 <body>
@@ -491,7 +503,8 @@ header .controls:has(#roomButton:not([hidden])) { display:flex; flex-wrap:wrap; 
 <details id="briefing" class="panel"><summary>Read the case briefing</summary><div id="briefingText"></div></details>
 <p id="counts" aria-live="polite"></p><div id="board" class="board"></div>
 <button id="notesButton" class="notes-launcher">Case notes</button>
-<form id="solve" class="panel"><h2>File your theory</h2><label for="guess">What item most likely made people sick?</label><div class="theory-evidence"><label for="theoryEvidence">Which clue helped you make this guess?</label><select id="theoryEvidence" required disabled><option value="">No evidence selected</option></select><label for="theoryReason">What does your selected clue support?</label><select id="theoryReason" required disabled><option value="">Choose your reasoning</option></select><small>Both your answer and supporting reasoning must hold up. In Head-to-Head, fewer hints rank first, then faster times. Reading cards does not affect your rank.</small></div><div class="entry"><input id="guess" maxlength="120" autocomplete="off" required placeholder="Type one item"><button class="primary">Submit guess</button></div><p id="status" role="status"></p></form>
+<form id="solve" class="panel"><h2>File your theory</h2><label for="guess">What item most likely made people sick?</label><div class="theory-evidence"><label for="theoryEvidence">Which clue helped you make this guess?</label><select id="theoryEvidence" required disabled><option value="">No evidence selected</option></select><label for="theoryReason">What does your selected clue support?</label><select id="theoryReason" required disabled><option value="">Choose your reasoning</option></select><small>Both your answer and supporting reasoning must hold up. In Head-to-Head, fewer hints rank first, then faster times. Reading cards does not affect your rank.</small></div><div class="entry"><input id="guess" maxlength="120" autocomplete="off" required placeholder="Type one item"><button class="primary">Submit guess</button></div><p id="proposalStatus" role="status" hidden></p><p id="status" role="status"></p></form>
+<section id="teamProposals" class="panel" hidden aria-labelledby="proposalsTitle"><h2 id="proposalsTitle">Proposed theories</h2><p id="proposalHelp"></p><div id="proposalList"></div><div id="hostGuessControls" hidden><p id="selectedTheoryNote">Choose a proposed theory before submitting a guess.</p><button id="submitTeamGuess" class="primary" type="button" disabled>Submit guess</button></div></section>
 </section>
 <section id="ending" class="screen" hidden><div class="eyebrow">Clueborne #001 · The Midnight Potluck</div><h1 id="endingTitle" tabindex="-1">Case closed</h1><div id="result"></div>
 <div class="panel share-panel"><label><input type="checkbox" id="shareTime" checked> Include time</label><button id="copyResult" type="button">Copy result</button><p id="shareStatus" role="status"></p><input id="shareText" aria-label="Spoiler-free result" readonly hidden></div><p id="raceNotice" role="status"></p><div id="leaderboard"></div><div class="debrief-heading"><div class="eyebrow">Connect the dots</div><h2 id="debriefTitle" tabindex="-1">Every clue had a part to play.</h2><p>Revisit the trail. Open a card to see the detective skill behind it.</p></div><div id="debrief"></div><div class="ending-actions"><button id="backCases" class="primary">Back to the field office</button><button id="replay">Revisit this case</button></div></section>
@@ -507,7 +520,7 @@ header .controls:has(#roomButton:not([hidden])) { display:flex; flex-wrap:wrap; 
 <form method="dialog"><button class="primary" value="debrief" autofocus>See the reveal</button></form>
 </dialog>
 <dialog id="help" aria-labelledby="helpTitle"><div class="dialog-top"><h2 id="helpTitle">How to play</h2><form method="dialog"><button>Close</button></form></div><ol>
-<li>Find the source in three guesses. Solved players rank by fewer hints first, then active completion time. Equal hint counts and times share a place. Guesses appear as context. Cards opened do not affect rank. Every guess requires an opened clue and a reasoning choice; both the answer and reasoning must be correct. Your stopwatch starts on the evidence board. Pause hides the investigation and suspends audio. In teams, the shared clock keeps running and only the host submits guesses. Head-to-head results appear when everyone finishes or withdraws. The host can end a race, marking unfinished players as unranked.</li><li><strong>Choose a case.</strong> With friends, choose your mode and case first, then share the link from the room lobby. The host starts the introduction for everyone. Room controls remain available under “Room” in the header. Watch the opening scene or skip to the board. You can reread the story under “Read the case briefing.”</li>
+<li>Find the source in three guesses. Solved players rank by fewer hints first, then active completion time. Equal hint counts and times share a place. Guesses appear as context. Cards opened do not affect rank. Every guess requires an opened clue and a reasoning choice; both the answer and reasoning must be correct. Your stopwatch starts on the evidence board. Pause hides the investigation and suspends audio. In teams, the shared clock keeps running and everyone proposes a theory and the host selects one to submit as a guess. Head-to-head results appear when everyone finishes or withdraws. The host can end a race, marking unfinished players as unranked.</li><li><strong>Choose a case.</strong> With friends, choose your mode and case first, then share the link from the room lobby. The host starts the introduction for everyone. Room controls remain available under “Room” in the header. Watch the opening scene or skip to the board. You can reread the story under “Read the case briefing.”</li>
 <li><strong>Investigate.</strong> Pick up any evidence card in any order, then choose “Put down” to return to the board. Opening cards doesn’t cost a guess.</li>
 <li><strong>Use hints if you get stuck.</strong> Some cards have a “Show hint” button. A hint points out what to look at. In Head-to-Head, using more hints lowers your rank among solved players; time breaks ties. Each card’s hint counts once.</li>
 <li><strong>Keep case notes.</strong> Open the notebook in the corner and type your own observations. If you reveal a hint, you can choose to add it to your notes.</li>
@@ -1132,7 +1145,7 @@ async function joinRoom(code,selectedMode){
  room=await request(code?'join':'create',{mode:selectedMode,team:selectedMode==='team'?(byId('teamName').value.trim()||'Disease Detectives'):''});
  roomCode=room.code;mode=room.mode;
  byId('roomTitle').textContent=(mode==='team'?'Team Investigation':'Head-to-Head')+' · The Midnight Potluck';
- byId('roomDescription').textContent=mode==='team'?'Share evidence and three guesses. The host submits the team’s answers.':'Investigate independently. Invite everyone before starting; results appear when all players finish or withdraw. Solved players rank by fewer hints, then time. Cards opened never affect rank.';
+ byId('roomDescription').textContent=mode==='team'?'Share evidence and three guesses. Everyone proposes a theory; the host selects one to submit.':'Investigate independently. Invite everyone before starting; results appear when all players finish or withdraw. Solved players rank by fewer hints, then time. Cards opened never affect rank.';
  history.replaceState(null,'','?room='+roomCode);
  pendingMultiplayerMode=null;byId('caseSetupNote').hidden=true;byId('cancelMultiplayer').hidden=true;
  byId('roomLink').value=location.href;
@@ -1188,8 +1201,9 @@ async function syncRoom(){
  room=await request('sync');
  const complete=mode==='race'&&room.race_complete;
  byId('roomStatus').textContent=(mode==='team'?room.team+' · ':'')+Object.values(room.players).filter(player=>!player.left).map(player=>player.name).join(', ')+(complete?' · Race complete':room.started?' · In progress':' · Waiting for host to start');
- if(mode==='team')byId('status').textContent=room.message||room.proposal||(3-room.guesses)+' guesses remaining.';
- byId('solve').querySelector('button').textContent=mode==='team'&&room.host!==playerId?'Propose theory':'Submit guess';
+ if(mode==='team')byId('status').textContent=room.message||(3-room.guesses)+' guesses remaining.';
+ byId('solve').querySelector('button').textContent=mode==='team'?'Propose theory':'Submit guess';
+ renderTeamProposals();
  byId('hostStart').hidden=room.host!==playerId||!!room.started;
  byId('endRace').hidden=mode!=='race'||room.host!==playerId||!room.started||complete;
  byId('roomLeave').textContent=mode==='race'&&room.started&&!room.players[playerId]?.result?'Withdraw from race':'Leave room';
@@ -1238,6 +1252,48 @@ function finish(result){
  byId('outcome').classList.toggle('solved',result.correct);
  timers.push(setTimeout(()=>{if(screen==='ending'){byId('outcome').showModal();celebration(result.correct);}},950));
 }
+let selectedProposalId=null,proposalSignature='',submittingTeamGuess=false;
+function updateTeamGuessButton(){
+ const selected=Object.values(room?.proposals||{}).find(p=>p.id===selectedProposalId);
+ byId('submitTeamGuess').disabled=!selected||submittingTeamGuess||!!room?.result||paused;
+ byId('selectedTheoryNote').textContent=selected?'Selected: '+selected.answer+' · proposed by '+selected.name:'Choose a proposed theory before submitting a guess.';
+}
+function renderTeamProposals(){
+ const team=mode==='team';byId('teamProposals').hidden=!team;
+ if(!team){byId('proposalStatus').hidden=true;return;}
+ const proposals=Object.values(room.proposals||{}),host=room.host===playerId;
+ if(!proposals.some(p=>p.id===selectedProposalId))selectedProposalId=null;
+ byId('hostGuessControls').hidden=!host;
+ byId('proposalHelp').textContent=host?'Everyone, including you, can propose one theory at a time. Select one below to use a team guess. You can remove any theory with ×.':'You can propose one theory at a time; proposing again replaces yours. Remove your theory with ×. The host chooses which theory to submit.';
+ const signature=JSON.stringify([proposals,room.host,room.result]);
+ if(signature!==proposalSignature){
+  proposalSignature=signature;const list=byId('proposalList');list.replaceChildren();
+  if(!proposals.length){const empty=document.createElement('p');empty.textContent='No theories yet. Propose one using the form above.';list.append(empty);}
+  for(const proposal of proposals){
+   const card=document.createElement('article');card.className='proposal-card';
+   const label=document.createElement(host?'label':'div');
+   if(host){const radio=document.createElement('input');radio.type='radio';radio.name='teamTheory';radio.id='proposal-'+proposal.id;radio.value=proposal.id;radio.checked=proposal.id===selectedProposalId;radio.setAttribute('aria-label','Select '+proposal.name+'’s theory: '+proposal.answer);radio.onchange=()=>{selectedProposalId=proposal.id;updateTeamGuessButton();};label.htmlFor=radio.id;card.append(radio);}
+   const answer=document.createElement('strong');answer.textContent=proposal.answer;
+   const author=document.createElement('small');author.textContent='Proposed by '+proposal.name+(proposal.player===playerId?' (you)':'');
+   const clue=document.createElement('p');clue.textContent='Evidence: '+(cards[proposal.evidence]?.title||'Unknown clue');
+   const reason=document.createElement('p');reason.textContent=reasonLabel(proposal.reason);
+   label.append(answer,author,clue,reason);
+   if(proposal.submissions){const attempted=document.createElement('small');attempted.textContent='Submitted '+proposal.submissions+(proposal.submissions===1?' time':' times')+' · available to revise or propose again';label.append(attempted);}
+   card.append(label);
+   if(host||proposal.player===playerId){const remove=document.createElement('button');remove.type='button';remove.className='proposal-remove';remove.textContent='×';remove.setAttribute('aria-label','Remove '+proposal.name+'’s theory: '+proposal.answer);remove.onclick=async()=>{remove.disabled=true;try{room=await request('remove_proposal',{proposalId:proposal.id});byId('proposalStatus').textContent='Theory removed.';byId('proposalStatus').hidden=false;renderTeamProposals();}catch(e){byId('status').textContent=e.message;remove.disabled=false;}};card.append(remove);}
+   list.append(card);
+  }
+ }
+ updateTeamGuessButton();
+}
+byId('submitTeamGuess').onclick=async()=>{
+ if(submittingTeamGuess||paused||mode!=='team'||room?.host!==playerId||!selectedProposalId||room.result)return;
+ submittingTeamGuess=true;updateTeamGuessButton();
+ try{room=await request('guess',{proposalId:selectedProposalId,expectedGuesses:room.guesses});selectedProposalId=null;proposalSignature='';byId('proposalStatus').hidden=true;await syncRoom();}
+ catch(e){await syncRoom();byId('proposalStatus').textContent=e.message;byId('proposalStatus').hidden=false;}
+ finally{submittingTeamGuess=false;updateTeamGuessButton();}
+};
+
 let submittingTheory=false;
 byId('solve').addEventListener('submit',async event=>{
  event.preventDefault();event.stopImmediatePropagation();
@@ -1253,7 +1309,7 @@ byId('solve').addEventListener('submit',async event=>{
  submittingTheory=true;const submitButton=byId('solve').querySelector('button');submitButton.disabled=true;
  try{
  if(mode==='team'){
-  try{room=await request(room.host===playerId?'guess':'propose',{answer,evidence:Number(selectedClue),reason});byId('status').textContent=room.message||'';await syncRoom();}catch(e){byId('status').textContent=e.message;}return;
+  try{room=await request('propose',{answer:byId('guess').value.trim(),evidence:Number(selectedClue),reason});byId('proposalStatus').textContent='Your theory is proposed. Proposing again replaces it.';byId('proposalStatus').hidden=false;await syncRoom();}catch(e){byId('status').textContent=e.message;}return;
  }
  guesses++;
  const answerCorrect=aliases.has(answer),reasoningCorrect=reasoningByCard[Number(selectedClue)]===reason;

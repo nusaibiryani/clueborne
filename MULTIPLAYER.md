@@ -37,3 +37,6 @@ Players can withdraw; the host can end a started race. Completed results remain 
 
 ## Multiplayer screens
 Choose a multiplayer mode (and a team name for Team Investigation), then choose a case. Selecting the case creates a dedicated invitation lobby. Invitees enter that lobby directly. The host starts the introduction for everyone; each player chooses when to open the evidence board. During the introduction, investigation, and debrief, the header’s Room button opens invitation, leave/withdraw, and host end-race controls. Refresh restores the lobby or personal investigation stage instead of skipping the introduction.
+
+## Team proposals
+All team members, including the host, use Propose theory. Each member has one current proposal, replaced when they propose again. Proposals include a suspected source, an opened clue, and reasoning. Members can remove their own proposal; the host can remove any. Only the host selects a current proposal and uses Submit guess. Incorrect submissions remain in the proposal list with their submission count, and proposing/removing costs no guesses. The case still ends on a correct answer with matching reasoning or the third official guess. Server-side proposal IDs and expected guess counts reject stale/deleted selections and duplicate submissions.
