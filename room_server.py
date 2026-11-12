@@ -11,6 +11,11 @@ from time import time
 HTML = Path(__file__).with_name("clueborne.html")
 ASSETS = Path(__file__).with_name("assets")
 PUBLIC_ASSETS = {
+    "clueborne-glossy.webp": "image/webp",
+    "clueborne-glossy-32.png": "image/png",
+    "clueborne-glossy-48.png": "image/png",
+    "clueborne-glossy-180.png": "image/png",
+    "clueborne-share-glossy.png": "image/png",
     "clueborne-mark.svg": "image/svg+xml",
     "favicon.svg": "image/svg+xml",
     "favicon-32.png": "image/png",
