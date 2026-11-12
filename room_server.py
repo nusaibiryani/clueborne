@@ -9,6 +9,14 @@ from threading import Lock
 from time import time
 
 HTML = Path(__file__).with_name("clueborne.html")
+ASSETS = Path(__file__).with_name("assets")
+PUBLIC_ASSETS = {
+    "clueborne-mark.svg": "image/svg+xml",
+    "favicon.svg": "image/svg+xml",
+    "favicon-32.png": "image/png",
+    "apple-touch-icon.png": "image/png",
+    "clueborne-share.png": "image/png",
+}
 ROOMS = {}
 LOCK = Lock()
 REASONS = ['hypothesis', 'exposures', 'shared', 'comparison', 'timing']
@@ -43,7 +51,13 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self):
-        if self.path.split("?", 1)[0] == "/":
+        path = self.path.split("?", 1)[0]
+        if path.startswith("/assets/"):
+            filename = path.removeprefix("/assets/")
+            if filename in PUBLIC_ASSETS:
+                return self.reply(200, (ASSETS / filename).read_bytes(), PUBLIC_ASSETS[filename])
+            return self.reply(404, {"error": "Asset not found."})
+        if path == "/":
             return self.reply(200, HTML.read_bytes(), "text/html; charset=utf-8")
         self.room_request()
 
