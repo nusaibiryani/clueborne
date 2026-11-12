@@ -20,7 +20,7 @@ for key, label in (("chicken", "Chicken skewers"), ("lemonade", "Lemonade"), ("c
     unexposed = [g for g in guests if not g[key]]
     survey.append([label, sum(g["sick"] for g in exposed), len(exposed), sum(g["sick"] for g in unexposed), len(unexposed)])
 data = dict(total=len(guests), sick=sum(g["sick"] for g in guests), survey=survey)
-path = root / "outbreakle.html"
+path = root / "clueborne.html"
 html = path.read_text()
 html = re.sub(r"// BEGIN GENERATED POTLUCK DATA.*?// END GENERATED POTLUCK DATA",
     "// BEGIN GENERATED POTLUCK DATA\nconst potluck = " + json.dumps(data) + ";\n// END GENERATED POTLUCK DATA", html, flags=re.S)

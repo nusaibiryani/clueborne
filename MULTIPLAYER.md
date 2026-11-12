@@ -1,4 +1,4 @@
-# Outbreakle
+# Clueborne
 Run `python3 room_server.py` and open http://localhost:8000.
 On Render use build command `python -m py_compile room_server.py` and start command `python room_server.py`.
 
@@ -20,4 +20,17 @@ The client-side answer is inspectable. Competition is informal and based on trus
 ## Validation
 Python and JavaScript syntax checks passed. Server logic checks covered shared evidence deduplication,
 host-only team guesses, proposals, race joins and separate player results.
-A full browser playthrough, mobile visual audit and live multiplayer test are still required.
+Browser checks cover solo reasoning, two-player race withdrawal and host ending, and shared team guesses. Responsive layout checks cover phone, tablet and laptop widths.
+
+## Music
+“I Knew a Guy” Kevin MacLeod (incompetech.com).
+Licensed under Creative Commons: By Attribution 4.0 License
+https://creativecommons.org/licenses/by/4.0/
+Official source and download: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100199
+Adaptations: re-encoded at 192 kbps, added a 0.2-second opening fade and 1-second closing fade, looped for gameplay.
+The track is embedded in clueborne.html, with music volume set to 28%.
+
+## Investigation rules
+Every guess requires an opened evidence card and a choice explaining what that clue supports. Both the item and the reasoning must be correct. Failed attempts give neutral feedback; reasoning explanations appear in the final debrief.
+Solved Head-to-Head players rank by fewer hints first, then active completion time. Equal hint counts and exact times share a place. Guesses provide context, and opened cards remain a personal statistic. Each distinct card hint counts once. One supporting clue and its reasoning are required; there is no second supporting clue field. Withdrawn and host-ended unfinished players are unranked.
+Players can withdraw; the host can end a started race. Completed results remain intact. If the host leaves, control transfers to a remaining player. Closing a tab does not automatically withdraw a player: the host can end the race if someone disappears.
