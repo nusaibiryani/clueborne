@@ -11,6 +11,7 @@ from time import time
 HTML = Path(__file__).with_name("clueborne.html")
 ASSETS = Path(__file__).with_name("assets")
 PUBLIC_ASSETS = {
+    "clueborne-favicon.ico": "image/x-icon",
     "clueborne-glossy.webp": "image/webp",
     "clueborne-glossy-32.png": "image/png",
     "clueborne-glossy-48.png": "image/png",
@@ -21,6 +22,11 @@ PUBLIC_ASSETS = {
     "favicon-32.png": "image/png",
     "apple-touch-icon.png": "image/png",
     "clueborne-share.png": "image/png",
+}
+ROOT_ICONS = {
+    "/favicon.ico": ("clueborne-favicon.ico", "image/x-icon"),
+    "/apple-touch-icon.png": ("clueborne-glossy-180.png", "image/png"),
+    "/apple-touch-icon-precomposed.png": ("clueborne-glossy-180.png", "image/png"),
 }
 ROOMS = {}
 LOCK = Lock()
@@ -53,10 +59,17 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
-        self.wfile.write(body)
+        if self.command != "HEAD":
+            self.wfile.write(body)
+
+    def do_HEAD(self):
+        self.do_GET()
 
     def do_GET(self):
         path = self.path.split("?", 1)[0]
+        if path in ROOT_ICONS:
+            filename, content_type = ROOT_ICONS[path]
+            return self.reply(200, (ASSETS / filename).read_bytes(), content_type)
         if path.startswith("/assets/"):
             filename = path.removeprefix("/assets/")
             if filename in PUBLIC_ASSETS:
