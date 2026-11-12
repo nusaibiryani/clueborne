@@ -1,6 +1,6 @@
 # Clueborne
 
-A cozy outbreak mystery game. Investigate a campus potluck, connect evidence to your reasoning, and identify the most likely source in three guesses.
+A cozy outbreak mystery game. Investigate the outbreak, connect evidence to your reasoning, and identify the most likely source in three guesses.
 
 ## Run locally
 
